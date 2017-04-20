@@ -15,7 +15,7 @@
  *  Author: SmartThings
  */
 definition(
-    name: "Clear an Indicator On Motion",
+    name: "Clear an Indicator on Motion",
     namespace: "grahampcharles",
     author: "Graham Charles",
     description: "Turn off an indicator light when a motion detector triggers, but only if the indicator is already a specific color.",
@@ -33,11 +33,12 @@ preferences {
     }
      section ("Is already set to...") {
     	input "colorBefore", "enum", title: "What color?", required: true, options:
-        		[  "Soft White" , "Daylight" , "White", "Warm White" , "Blue", "Green", "Yellow", "Orange", "Purple", "Pink", "Red" ]
+        		[  0: "Off", 23: "Soft White" , 53: "Daylight" , 20: "Warm White" , 70: "Blue", 39: "Green", 25: "Yellow",10: "Orange", 75: "Purple", 83: "Pink", 100: "Red" ]
     }
-	section ("Then turn the light...") {
-		input "lightOn", "bool", defaultValue: false, required: true
-	}
+     section ("Then set it to...") {
+    	input "colorAfter", "enum", title: "What color?", required: true, defaultValue: 0, options:
+        		[  0: "Off", 23: "Soft White" , 53: "Daylight" , 20: "Warm White" , 70: "Blue", 39: "Green", 25: "Yellow",10: "Orange", 75: "Purple", 83: "Pink", 100: "Red" ]
+    }
 }
 
 def installed()
@@ -56,33 +57,32 @@ def motionDetectorHandler(evt) {
     var doIt = false;
     
     // get hue
-    switch (indicator1.hue) {
-    	case 23: doIt = (colorBefore == "Soft White");
-        	break;
-    	case 53: doIt = (colorBefore == "Daylight");
-        	break;    	
-    	case 20: doIt = (colorBefore == "Warm White");
-        	break;
-    	case 70: doIt = (colorBefore == "Blue");
-        	break;
-    	case 39: doIt = (colorBefore == "Green");
-        	break;
-    	case 25: doIt = (colorBefore == "Yellow");
-        	break;
-    	case 10: doIt = (colorBefore == "Orange");
-        	break;
-    	case 75: doIt = (colorBefore == "Purple");
-        	break;
-    	case 83: doIt = (colorBefore == "Pink");
-        	break;
-    	case 100: doIt = (colorBefore == "Red");
-        	break;
-        default: 
-	        break;
-    }
-    
+    doIt = (indicator1.hue == colorBefore);
+
 	if (doIt) {
-    	indicator1.setSaturation(0);
+    	if (colorAfter == 0) {
+    		indicator1.setSaturation(0);
+        } else {
+        	indicator1.setHue(colorAfter);
+            switch (colorAfter) {
+            	case 23: 
+					indicator1.setSaturation(56);
+                	break;
+                case 53:
+                	indicator1.setSaturation(91);
+                	break;
+                case 52: 
+                	indicator1.setSaturation(19);
+                	break;
+                case 20: 
+                	indicator1.setSaturation(80);
+					break;                
+                default: 
+                	indicator1.setSaturation(100);
+                    break;
+            }
+        }
+            
     }
 	
     /*
